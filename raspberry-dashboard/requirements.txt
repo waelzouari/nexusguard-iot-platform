@@ -4,5 +4,4 @@ eventlet>=0.33.3
 adafruit-circuitpython-dht>=3.7.8
 adafruit-circuitpython-ads1x15>=2.2.23
 RPi.GPIO>=0.7.1
-board
-busio
+adafruit-blinka
