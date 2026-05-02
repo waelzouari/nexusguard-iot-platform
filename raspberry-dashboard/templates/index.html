@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusGuard Village — Tableau de Bord</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:#f8faf5;color:#1f2937;min-height:100vh;padding-bottom:48px;}
+
+    /* Navbar */
+    .navbar{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,0.04);}
+    .nav-brand{display:flex;align-items:center;gap:10px;}
+    .nav-logo{width:36px;height:36px;object-fit:contain;border-radius:50%;}
+    .brand-name{font-size:15px;font-weight:800;color:#166534;}
+    .brand-sub{font-size:11px;color:#9ca3af;margin-top:-2px;}
+    .nav-right{display:flex;align-items:center;gap:12px;}
+    .conn-badge{font-size:12px;padding:5px 14px;border-radius:20px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;display:flex;align-items:center;gap:6px;font-weight:500;}
+    .conn-badge.on{background:#f0fdf4;border-color:#bbf7d0;color:#166534;}
+    .conn-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+    .btn-logout{background:#fff;border:1px solid #e5e7eb;color:#6b7280;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;text-decoration:none;}
+    .btn-logout:hover{border-color:#d1d5db;color:#374151;}
+
+    /* Layout */
+    .wrap{max-width:1160px;margin:0 auto;padding:0 24px;}
+    .page-hd{padding:32px 0 20px;}
+    .page-title{font-size:22px;font-weight:800;color:#1f2937;}
+    .page-title span{color:#15803d;}
+    .page-sub{font-size:13px;color:#9ca3af;margin-top:3px;}
+
+    /* Status banner */
+    .status-bar{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+    .s-ind{width:10px;height:10px;border-radius:50%;background:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,0.15);}
+    .s-ind.warn{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,0.15);}
+    .s-ind.alert{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,0.15);}
+    .mode-group{display:flex;align-items:center;gap:8px;}
+    .mode-lbl{font-size:13px;color:#6b7280;}
+    .mode-btn{padding:6px 18px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid;font-family:'Inter',sans-serif;transition:all 0.2s;background:#fff;}
+    .m-auto{border-color:#15803d;color:#15803d;}
+    .m-auto.active{background:#15803d;color:#fff;}
+    .m-manual{border-color:#f59e0b;color:#f59e0b;}
+    .m-manual.active{background:#f59e0b;color:#fff;}
+
+    /* Cards */
+    .cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:24px;transition:all 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+    .card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px);}
+    .c-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+    .c-title{font-size:12px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+    .c-val{font-size:34px;font-weight:800;color:#1f2937;line-height:1;margin-bottom:4px;}
+    .c-val span{font-size:16px;font-weight:500;color:#9ca3af;}
+    .c-sub{font-size:12px;color:#9ca3af;margin-bottom:14px;}
+    .nbar{height:6px;border-radius:3px;background:#f3f4f6;overflow:hidden;}
+    .nbar-fill{height:100%;border-radius:3px;transition:width 0.7s ease;}
+
+    /* Pump card */
+    .pump-icon-big{font-size:44px;text-align:center;margin:8px 0 6px;transition:color 0.3s;}
+    .pump-state{font-size:14px;font-weight:700;text-align:center;margin-bottom:14px;}
+    .pump-btn{width:100%;padding:11px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;font-family:'Inter',sans-serif;transition:all 0.2s;background:#fff;}
+    .pump-off{border-color:#15803d;color:#15803d;}
+    .pump-on{border-color:#ef4444;color:#ef4444;}
+    .pump-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+    /* Bottom */
+    .bottom{display:grid;grid-template-columns:1fr 2fr;gap:16px;}
+    .reasons-list{list-style:none;margin:0;padding:0;}
+    .reasons-list li{padding:9px 0;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;}
+    .reasons-list li:last-child{border-bottom:none;}
+    .settings-sep{margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6;}
+    .stg-title{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+    .stg-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+    .stg-lbl{font-size:12px;color:#6b7280;min-width:90px;}
+    .stg-input{flex:1;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;color:#1f2937;font-size:12px;font-family:'Inter',sans-serif;outline:none;}
+    .stg-input:focus{border-color:#15803d;}
+    .apply-btn{padding:7px 14px;background:#15803d;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+    .apply-btn:hover{background:#166534;}
+    .chart-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+    .chart-hd{font-size:14px;font-weight:700;color:#1f2937;margin-bottom:4px;}
+    .chart-sub{font-size:12px;color:#9ca3af;margin-bottom:16px;}
+    canvas{max-height:260px!important;}
+
+    @media(max-width:900px){.cards-row{grid-template-columns:repeat(2,1fr);}.bottom{grid-template-columns:1fr;}}
+    @media(max-width:600px){.navbar{padding:0 16px;}.wrap{padding:0 16px;}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="nav-logo" onerror="this.style.display='none'">
+    <div>
+      <div class="brand-name">NexusGuard Village</div>
+      <div class="brand-sub">Tableau de Bord · {{ username }}</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div id="connection-status" class="conn-badge">
+      <span class="conn-dot"></span>Déconnecté
+    </div>
+    <a href="/logout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-hd">
+    <h1 class="page-title">Système <span>WEF Nexus</span></h1>
+    <p class="page-sub">Dernière mise à jour : <span id="last-update">--</span></p>
+  </div>
+
+  <!-- Status banner -->
+  <div class="status-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div id="nexus-status-indicator" class="s-ind"></div>
+      <div>
+        <div style="font-weight:600;font-size:14px;">Statut système</div>
+        <div style="font-size:12px;color:#9ca3af;">WebSocket temps réel</div>
+      </div>
+    </div>
+    <div class="mode-group">
+      <span class="mode-lbl">Mode :</span>
+      <button id="mode-auto-btn" class="mode-btn m-auto active" onclick="setMode('auto')">Automatique</button>
+      <button id="mode-manual-btn" class="mode-btn m-manual" onclick="setMode('manual')">Manuel</button>
+    </div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-row">
+    <div class="card">
+      <div class="c-icon" style="background:#f0fdf4;">🌱</div>
+      <div class="c-title">Humidité Sol</div>
+      <div class="c-val" id="val-soil">--<span>%</span></div>
+      <div class="c-sub">Seuil sec : <span id="thresh-soil-dry">40</span>%</div>
+      <div class="nbar"><div id="prog-soil" class="nbar-fill" style="width:0%;background:#15803d;"></div></div>
+    </div>
+    <div class="card">
+      <div class="c-icon" style="background:#eff6ff;">💧</div>
+      <div class="c-title">Niveau d'Eau</div>
+      <div class="c-val" id="val-water-pct">--<span>%</span></div>
+      <div class="c-sub"><span id="val-water-cm">--</span> cm · Min : <span id="thresh-water-min">20</span>%</div>
+      <div class="nbar"><div id="prog-water" class="nbar-fill" style="width:0%;background:#3b82f6;"></div></div>
+    </div>
+    <div class="card">
+      <div class="c-icon" style="background:#fffbeb;">🌡️</div>
+      <div class="c-title">Température</div>
+      <div class="c-val" id="val-temp">--<span>°C</span></div>
+      <div class="c-sub">Air : <span id="val-hum">--</span>% · Max : <span id="thresh-temp-max">45</span>°C</div>
+      <div class="nbar"><div id="prog-temp" class="nbar-fill" style="width:0%;background:#f59e0b;"></div></div>
+    </div>
+    <div class="card">
+      <div class="c-title" style="margin-bottom:0;">Contrôle Pompe</div>
+      <div id="pump-icon" class="pump-icon-big">⚡</div>
+      <div id="pump-state" class="pump-state" style="color:#ef4444;">ARRÊTÉE</div>
+      <button id="btn-pump-toggle" class="pump-btn pump-off" disabled onclick="togglePump()">Mode manuel requis</button>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom">
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;color:#1f2937;margin-bottom:12px;">🧠 Logique Nexus WEF</div>
+      <ul id="nexus-reasons" class="reasons-list">
+        <li><span>⏳</span>En attente de données...</li>
+      </ul>
+      <div class="settings-sep">
+        <div class="stg-title">Paramètres rapides</div>
+        <form id="form-thresholds" onsubmit="applyThresholds(event)">
+          <div class="stg-row"><span class="stg-lbl">Sol sec (%) :</span><input type="number" id="input-soil-dry" class="stg-input" value="40"></div>
+          <div class="stg-row"><span class="stg-lbl">Eau min (%) :</span><input type="number" id="input-water-min" class="stg-input" value="20"></div>
+          <div class="stg-row"><span class="stg-lbl">Temp max (°C) :</span><input type="number" id="input-temp-max" class="stg-input" value="45"><button type="submit" class="apply-btn" id="apply-btn">Appliquer</button></div>
+        </form>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-hd">📊 Historique des capteurs</div>
+      <div class="chart-sub">30 dernières minutes</div>
+      <canvas id="historyChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script>
+  let mode='auto', pumpOn=false;
+  Chart.defaults.color='#9ca3af';
+  Chart.defaults.borderColor='#f3f4f6';
+  const chart=new Chart(document.getElementById('historyChart').getContext('2d'),{
+    type:'line',
+    data:{labels:[],datasets:[
+      {label:'Sol (%)',borderColor:'#15803d',backgroundColor:'rgba(21,128,61,0.06)',data:[],fill:true,tension:0.4,borderWidth:2,pointRadius:2},
+      {label:'Eau (%)',borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.06)',data:[],fill:true,tension:0.4,borderWidth:2,pointRadius:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}},
+        tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#166534',bodyColor:'#374151',boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}},
+      scales:{x:{ticks:{maxTicksLimit:8,font:{size:10}},grid:{color:'#f9fafb'}},y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f9fafb'}}}}
+  });
+
+  const socket=io();
+  const connEl=document.getElementById('connection-status');
+  socket.on('connect',()=>{connEl.innerHTML='<span class="conn-dot"></span>Connecté';connEl.className='conn-badge on';socket.emit('request_history');});
+  socket.on('disconnect',()=>{connEl.innerHTML='<span class="conn-dot"></span>Déconnecté';connEl.className='conn-badge';});
+  socket.on('sensor_update',updateDash);
+  socket.on('history_update',updateChart);
+
+  function fmt(v){return v!=null?v:'--';}
+  function updateDash(d){
+    if(d.timestamp) document.getElementById('last-update').innerText=moment(d.timestamp).format('HH:mm:ss');
+    document.getElementById('val-soil').innerHTML=`${fmt(d.soil_humidity)}<span>%</span>`;
+    if(d.soil_humidity!=null) document.getElementById('prog-soil').style.width=d.soil_humidity+'%';
+    document.getElementById('val-water-pct').innerHTML=`${fmt(d.water_pct)}<span>%</span>`;
+    document.getElementById('val-water-cm').innerText=fmt(d.water_level_cm);
+    if(d.water_pct!=null){const b=document.getElementById('prog-water');b.style.width=d.water_pct+'%';b.style.background=d.water_pct<20?'#ef4444':d.water_pct<40?'#f59e0b':'#3b82f6';}
+    document.getElementById('val-temp').innerHTML=`${fmt(d.temperature)}<span>°C</span>`;
+    document.getElementById('val-hum').innerText=fmt(d.humidity_air);
+    if(d.temperature!=null){const b=document.getElementById('prog-temp');b.style.width=Math.min(100,(d.temperature/60)*100)+'%';b.style.background=d.temperature>45?'#ef4444':'#f59e0b';}
+    const ind=document.getElementById('nexus-status-indicator');
+    ind.className='s-ind'+(d.nexus_status==='ALERT'?' alert':d.nexus_status==='WARN'?' warn':'');
+    const ul=document.getElementById('nexus-reasons');
+    ul.innerHTML=d.nexus_reasons&&d.nexus_reasons.length?d.nexus_reasons.map(r=>`<li><span>▸</span>${r}</li>`).join(''):'<li><span>⏳</span>Analyse en cours...</li>';
+    mode=d.mode||'auto'; pumpOn=d.pump||false;
+    document.getElementById('mode-auto-btn').classList.toggle('active',mode==='auto');
+    document.getElementById('mode-manual-btn').classList.toggle('active',mode==='manual');
+    const pb=document.getElementById('btn-pump-toggle');
+    pb.disabled=mode==='auto';
+    if(mode!=='auto'){pb.className='pump-btn '+(pumpOn?'pump-on':'pump-off');pb.innerText=pumpOn?'⏹ Arrêter la Pompe':'▶ Démarrer la Pompe';}
+    else{pb.className='pump-btn pump-off';pb.innerText='Mode manuel requis';}
+    const ic=document.getElementById('pump-icon');
+    const ps=document.getElementById('pump-state');
+    if(pumpOn){ic.innerText='💧';ps.innerText='EN MARCHE';ps.style.color='#15803d';}
+    else{ic.innerText='⚡';ps.innerText='ARRÊTÉE';ps.style.color='#ef4444';}
+  }
+  function updateChart(h){
+    if(!h||!h.length)return;
+    chart.data.labels=h.map(p=>moment(p.ts).format('HH:mm'));
+    chart.data.datasets[0].data=h.map(p=>p.soil_humidity);
+    chart.data.datasets[1].data=h.map(p=>p.water_pct);
+    chart.update('none');
+  }
+  function setMode(m){fetch('/api/mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:m})});}
+  function togglePump(){
+    if(mode==='auto')return;
+    document.getElementById('btn-pump-toggle').disabled=true;
+    socket.emit('pump_control',{action:'toggle',mode:'manual'});
+    setTimeout(()=>{document.getElementById('btn-pump-toggle').disabled=false;},1000);
+  }
+  function applyThresholds(e){
+    e.preventDefault();
+    fetch('/api/thresholds',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      soil_dry:document.getElementById('input-soil-dry').value,
+      water_min:document.getElementById('input-water-min').value,
+      temp_max:document.getElementById('input-temp-max').value
+    })}).then(r=>r.json()).then(d=>{
+      if(d.ok){
+        if(d.updated.soil_dry) document.getElementById('thresh-soil-dry').innerText=d.updated.soil_dry;
+        if(d.updated.water_min) document.getElementById('thresh-water-min').innerText=d.updated.water_min;
+        if(d.updated.temp_max) document.getElementById('thresh-temp-max').innerText=d.updated.temp_max;
+        const b=document.getElementById('apply-btn');b.innerText='OK ✓';b.style.background='#166534';
+        setTimeout(()=>{b.innerText='Appliquer';b.style.background='';},2000);
+      }
+    });
+  }
+</script>
+</body>
+</html>
